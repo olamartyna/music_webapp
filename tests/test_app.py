@@ -1,3 +1,8 @@
+from lib.album_repository import AlbumRepository
+from lib.album import Album
+
+from lib.artists_repository import ArtistsRepository
+from lib.artists import Artists
 # Tests for your routes go here
 
 # === Example Code Below ===
@@ -11,3 +16,71 @@ def test_get_emoji(web_client):
     assert response.data.decode("utf-8") == ":)"
 
 # === End Example Code ===
+
+
+def test_post_album(web_client, db_connection):
+    db_connection.seed('seeds/music_webapp.sql')
+    response = web_client.post("/albums", data={'title': 'Voyage', 'release_year': '2022', 'artist_id': '2'})
+    
+    assert response.status_code == 200
+
+    album_repo = AlbumRepository(db_connection)
+    albums = album_repo.all()
+
+    assert albums == [Album(1, 'Voyage', 2022, 2)]
+
+
+
+def test_get_artists(web_client, db_connection):
+    db_connection.seed('seeds/artists.sql')
+    response = web_client.get('/artists')
+    assert response.status_code == 200
+
+    # artists_repo = ArtistsRepository(db_connection)
+    # artists = artists_repo.all()
+
+    assert response.data.decode("utf-8") == 'Pixies, ABBA, Taylor Swift, Nina Simone'
+
+
+def test_post_artist(web_client, db_connection):
+    db_connection.seed('seeds/artists.sql')
+    response = web_client.post('/artists', data={'name': 'Wild nothing', 'genre': 'Indie'})
+    assert response.status_code == 200
+    
+    response = web_client.get('/artists')
+    assert response.status_code == 200
+    assert response.data.decode("utf-8") == 'Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing' 
+
+    # repo = ArtistsRepository(db_connection)
+    # response = repo.all()
+
+    # db_connection.seed('seeds/artists.sql')
+    # response = web_client.get('/artists')
+    # assert response.status_code == 200
+
+    # #artist_name = [artist.name for Artists in response]
+    # artist_name = [Artists for Artists in response]
+    # artist_name_string = ', '.join(artist_name)
+    # expected_names = 'Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing'
+    # # assert response == 'Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing'
+    # assert artist_name_string == expected_names 
+    # db_connection.seed('seeds/artists.sql')
+    # response = web_client.get('/artists')
+    # assert response.status_code == 200
+
+    # assert response.data.decode("utf-8") == 'Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing' 
+
+
+
+# def test_get_artists_after_adding(web_client, db_connection):
+#     db_connection.seed('seeds/artists.sql')
+#     response = web_client.get('/artists')
+#     assert response.status_code == 200
+#     print(response)
+#     assert response.data.decode("utf-8") == 'Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing'
+
+    # artist_name = [artist.name for artist in response]
+    # artist_name_string = ', '.join(artist_name)
+    # expected_names = 'Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing'
+    
+    # assert artist_name_string == expected_names 
