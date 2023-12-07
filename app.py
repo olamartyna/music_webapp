@@ -62,7 +62,13 @@ def post_artists():
     return ''
 
 
-
+@app.route('/add', methods=['GET'])
+def add():
+    predefined_names = ['Julia','Alice','Karim']
+    names_list = request.args['names']
+    names_list_split = names_list.split(',')
+    predefined_names.extend(names_list_split)
+    return ','.join(predefined_names)
 
 # This imports some more example routes for you to see how they work
 # You can delete these lines if you don't need them.
